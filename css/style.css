@@ -1397,6 +1397,67 @@ main {
   margin-top: 0.5rem;
 }
 
+.form-required {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.form-honey {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form-group--checkbox {
+  margin-bottom: 1.5rem;
+}
+
+.form-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.form-checkbox-label input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.form-feedback {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.form-feedback--success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.form-feedback--error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.contact-form .btn[disabled] {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.contact-thanks h1 {
+  margin-top: 0;
+}
+
 /* --- パンくず --- */
 .breadcrumb {
   font-size: 0.8125rem;
