@@ -33,10 +33,6 @@
       form.reportValidity();
       return false;
     }
-    var honey = form.querySelector('input[name="_honey"]');
-    if (honey && honey.value) {
-      return false;
-    }
     return true;
   }
 
