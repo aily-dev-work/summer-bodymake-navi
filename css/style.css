@@ -1402,14 +1402,6 @@ main {
   font-weight: 700;
 }
 
-.form-honey {
-  position: absolute;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-
 .form-group--checkbox {
   margin-bottom: 1.5rem;
 }
