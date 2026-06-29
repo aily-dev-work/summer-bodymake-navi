@@ -1065,9 +1065,23 @@ main {
   flex-shrink: 0;
 }
 
-.site-flow-step h3 {
+.site-flow-step h3,
+.site-flow-step-title {
   margin: 0 0 0.35rem;
   font-size: 1rem;
+  line-height: 1.45;
+}
+
+.site-flow-step-where::after {
+  content: "｜";
+}
+
+.site-flow-step-what {
+  display: block;
+}
+
+.site-flow-step-body {
+  min-width: 0;
 }
 
 .site-flow-step p {
@@ -1196,10 +1210,19 @@ main {
   }
 
   .site-flow-step {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    padding: 1.5rem 1.25rem;
+    padding: 1.5rem 1rem;
     min-height: 100%;
+  }
+
+  .site-flow-step-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
   }
 
   .site-flow-num {
@@ -1208,6 +1231,9 @@ main {
 
   .site-flow-step .btn {
     justify-self: center;
+    align-self: center;
+    margin-top: auto;
+    padding-top: 0.75rem;
   }
 
   .why-pillar-grid {
