@@ -1268,6 +1268,16 @@ main {
   margin-bottom: 1.5rem;
 }
 
+.pickup-subheading {
+  margin: 2rem 0 1rem;
+  font-size: 1.0625rem;
+  color: var(--color-primary);
+}
+
+.pickup-subheading:first-of-type {
+  margin-top: 0;
+}
+
 /* 目次 */
 .toc {
   background: var(--color-white);
