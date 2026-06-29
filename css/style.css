@@ -1013,6 +1013,18 @@ main {
   line-height: 1.5;
 }
 
+.affiliate-pickup-note--top {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.table-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
 .category-card .affiliate-pickup-note {
   margin-top: 0.5rem;
 }
