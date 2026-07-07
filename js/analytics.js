@@ -4,6 +4,14 @@
 (function () {
   "use strict";
 
+  if (typeof window.gtag === "function") {
+    return;
+  }
+
+  if (document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
+    return;
+  }
+
   var config = window.SITE_CONFIG || {};
   var measurementId = config.ga4MeasurementId;
 
