@@ -49,6 +49,7 @@ $ExcludeDirs = @(".git", ".github", "scripts", "_partials", ".cursor")
 $ExcludeFiles = @(
     ".deploy.env",
     ".deploy.env.example",
+    ".gitkeep",
     ".gitignore",
     "deploy-site.zip",
     "DEPLOYMENT.md",
@@ -113,6 +114,9 @@ function Walk-RemoteDirs {
 
     Get-ChildItem $localDir -File | ForEach-Object {
         if ($ExcludeFiles -contains $_.Name) {
+            return
+        }
+        if ($_.Name.StartsWith(".") -and $_.Name -ne ".htaccess") {
             return
         }
 
