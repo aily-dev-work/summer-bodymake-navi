@@ -57,6 +57,33 @@ $ExcludeFiles = @(
     "Untitled"
 )
 
+function Test-IsDeployablePath {
+    param([string]$RelativePath)
+
+    if (-not $RelativePath) {
+        return $false
+    }
+
+    $normalized = $RelativePath -replace "\\", "/"
+    $parts = $normalized -split "/"
+    foreach ($part in $parts) {
+        if ($ExcludeDirs -contains $part) {
+            return $false
+        }
+    }
+
+    $name = [System.IO.Path]::GetFileName($normalized)
+    if ($ExcludeFiles -contains $name) {
+        return $false
+    }
+    if ($name.StartsWith(".") -and $name -ne ".htaccess") {
+        return $false
+    }
+
+    $localPath = Join-Path $Root ($normalized -replace "/", [System.IO.Path]::DirectorySeparatorChar)
+    return (Test-Path $localPath -PathType Leaf)
+}
+
 function Ensure-FtpDirectory {
     param([string]$RemoteDir)
 
@@ -74,6 +101,50 @@ function Ensure-FtpDirectory {
     catch {
         # Directory may already exist.
     }
+}
+
+function Upload-RelativeFile {
+    param([string]$RelativePath)
+
+    $normalized = $RelativePath -replace "\\", "/"
+    $localPath = Join-Path $Root ($normalized -replace "/", [System.IO.Path]::DirectorySeparatorChar)
+    $remotePath = ($FTP_REMOTE_DIR.TrimEnd("/") + "/" + $normalized).Replace("//", "/")
+    $remoteDir = [System.IO.Path]::GetDirectoryName($remotePath).Replace("\", "/")
+
+    if ($remoteDir) {
+        Ensure-FtpDirectory $remoteDir
+    }
+
+    Write-Host "UP $remotePath"
+    Upload-FtpFileWithRetry $localPath $remotePath
+}
+
+function Get-ChangedDeployFiles {
+    $eventPath = [System.Environment]::GetEnvironmentVariable("GITHUB_EVENT_PATH")
+    if (-not $eventPath -or -not (Test-Path $eventPath)) {
+        return @()
+    }
+
+    try {
+        $event = Get-Content -Raw -Path $eventPath | ConvertFrom-Json
+    }
+    catch {
+        return @()
+    }
+
+    if (-not $event.before -or -not $event.after) {
+        return @()
+    }
+    if ($event.before -match '^0+$') {
+        return @()
+    }
+
+    $changed = git -C $Root diff --name-only --diff-filter=ACMRT $event.before $event.after
+    if ($LASTEXITCODE -ne 0) {
+        return @()
+    }
+
+    return @($changed | Where-Object { Test-IsDeployablePath $_ })
 }
 
 function Upload-FtpFile {
@@ -159,5 +230,19 @@ function Walk-RemoteDirs {
 }
 
 Write-Host "Deploy to ftp://$FTP_HOST$FTP_REMOTE_DIR"
-Walk-RemoteDirs ""
+$eventPath = [System.Environment]::GetEnvironmentVariable("GITHUB_EVENT_PATH")
+$changedFiles = Get-ChangedDeployFiles
+if ($changedFiles.Count -gt 0) {
+    Write-Host "Deploy changed files only: $($changedFiles.Count)"
+    foreach ($file in $changedFiles) {
+        Upload-RelativeFile $file
+    }
+}
+elseif ($eventPath -and (Test-Path $eventPath)) {
+    Write-Host "No deployable changed files detected. Skipping FTP upload."
+}
+else {
+    Write-Host "No deployable changed files detected. Running full deploy."
+    Walk-RemoteDirs ""
+}
 Write-Host "Done."
