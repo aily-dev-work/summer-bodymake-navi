@@ -101,6 +101,29 @@ function Upload-FtpFile {
     $response.Close()
 }
 
+function Upload-FtpFileWithRetry {
+    param(
+        [string]$LocalPath,
+        [string]$RemotePath
+    )
+
+    $maxAttempts = 3
+    for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+        try {
+            Upload-FtpFile -LocalPath $LocalPath -RemotePath $RemotePath
+            return
+        }
+        catch {
+            Write-Warning "Upload failed ($attempt/$maxAttempts): $RemotePath"
+            Write-Warning $_.Exception.Message
+            if ($attempt -eq $maxAttempts) {
+                throw
+            }
+            Start-Sleep -Seconds (2 * $attempt)
+        }
+    }
+}
+
 function Walk-RemoteDirs {
     param([string]$RelativeDir)
 
@@ -122,7 +145,7 @@ function Walk-RemoteDirs {
 
         $remotePath = $remoteDir.TrimEnd("/") + "/" + $_.Name
         Write-Host "UP $remotePath"
-        Upload-FtpFile $_.FullName $remotePath
+        Upload-FtpFileWithRetry $_.FullName $remotePath
     }
 
     Get-ChildItem $localDir -Directory | ForEach-Object {
